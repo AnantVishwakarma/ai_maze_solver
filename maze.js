@@ -21,11 +21,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function fillBlock(row, col, color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(col*cellWidth, row*cellHeight, cellWidth, cellHeight);
-}
-
 function getIndexFromCoordinates(row, col, cols) {
     return row * cols + col;
 }
@@ -35,6 +30,12 @@ function getCoordinatesFromIndex(index, cols) {
         row: Math.floor(index/cols),
         col: index % cols
     }
+}
+
+function fillBlock(index, color) {
+    ctx.fillStyle = color;
+    const {row, col} = getCoordinatesFromIndex(index, cols);
+    ctx.fillRect(col*cellWidth, row*cellHeight, cellWidth, cellHeight);
 }
 
 function getNeighboursOfIndex(index, rows, cols, distance = 2) {
@@ -146,8 +147,7 @@ async function constructRandomMaze(animate) {
 
     const randomCellIndex = 0;
     grid[randomCellIndex] = true;
-    const randomCellCoords = getCoordinatesFromIndex(randomCellIndex, cols);
-    fillBlock(randomCellCoords.row, randomCellCoords.col, color.passage);
+    fillBlock(randomCellIndex, color.passage);
     if(animate) await sleep(animateMazeGenerationWaitingTime);
     
     // add frontier cells, ie, neighbours which are walls
@@ -158,8 +158,7 @@ async function constructRandomMaze(animate) {
         const randomFrontierCellIndex = randInt(frontierCells.length);
         const frontierCell = frontierCells[randomFrontierCellIndex];
         grid[frontierCell] = true;
-        const frontierCellCoords = getCoordinatesFromIndex(frontierCell, cols);
-        fillBlock(frontierCellCoords.row, frontierCellCoords.col, color.passage);
+        fillBlock(frontierCell, color.passage);
         if(animate) await sleep(animateMazeGenerationWaitingTime);
         frontierCells.splice(randomFrontierCellIndex, 1);
 
@@ -179,8 +178,7 @@ async function constructRandomMaze(animate) {
 
         // Create a passage between neighbour (which is passage) and frontier cell
         grid[(frontierCell + frontierCellNeighbourWhichIsPassage) / 2] = true;
-        const inBetweenCell = getCoordinatesFromIndex((frontierCell + frontierCellNeighbourWhichIsPassage) / 2, cols);
-        fillBlock(inBetweenCell.row, inBetweenCell.col, color.passage);
+        fillBlock((frontierCell + frontierCellNeighbourWhichIsPassage) / 2, color.passage);
         if(animate) await sleep(animateMazeGenerationWaitingTime);
     }
 
@@ -188,10 +186,8 @@ async function constructRandomMaze(animate) {
     if((rows & 1) === 0) goalIndex -= cols;
     if((cols & 1) === 0) goalIndex -= 1;
 
-    const startCoords = getCoordinatesFromIndex(0, cols);
-    const goalCoords = getCoordinatesFromIndex(goalIndex, cols);
-    fillBlock(startCoords.row, startCoords.col, color.player);
-    fillBlock(goalCoords.row, goalCoords.col, color.goal);
+    fillBlock(0, color.player);
+    fillBlock(goalIndex, color.goal);
 
     mazeGrid = {
         grid: grid,
@@ -248,20 +244,17 @@ async function animateSolvingMaze(msSleep=10) {
         let coords = getCoordinatesFromIndex(x.index, cols);
         return [coords.row, coords.col];
     }));
-    const startCell = getCoordinatesFromIndex(travel[0].index, cols);
-    fillBlock(startCell.row, startCell.col, color.player);
+    fillBlock(travel[0].index, color.player);
     await sleep(msSleep);
     for(let i=1; i < travel.length; i++) {
-        const currentCell = getCoordinatesFromIndex(travel[i].index, cols);
-        const prevCell = getCoordinatesFromIndex(travel[i-1].index, cols);
+        fillBlock(travel[i].index, color.player); // fill current cell
 
-        fillBlock(currentCell.row, currentCell.col, color.player);
-
+        // fill previous cell
         if(travel[i-1].backtracking) {
-            fillBlock(prevCell.row, prevCell.col, color.backtracking);
+            fillBlock(travel[i-1].index, color.backtracking);
         }
         else {
-            fillBlock(prevCell.row, prevCell.col, color.travelling);
+            fillBlock(travel[i-1].index, color.travelling);
         }
         await sleep(msSleep);
     }
@@ -284,15 +277,13 @@ async function onClickBtnResetMaze() {
     ctx.fillStyle = color.wall;
     ctx.fillRect(0, 0, mazeWidth, mazeHeight);
     for(let i=0; i < mazeGrid.grid.length; i++) {
-        const coords = getCoordinatesFromIndex(i, cols);
         if(mazeGrid.grid[i]) {
-            fillBlock(coords.row, coords.col, color.passage);
+            fillBlock(i, color.passage);
         }
     }
-    const startCoords = getCoordinatesFromIndex(mazeGrid.startIndex, cols);
-    const goalCoords = getCoordinatesFromIndex(mazeGrid.goalIndex, cols);
-    fillBlock(startCoords.row, startCoords.col, color.player);
-    fillBlock(goalCoords.row, goalCoords.col, color.goal);
+
+    fillBlock(mazeGrid.startIndex, color.player);
+    fillBlock(mazeGrid.goalIndex, color.goal);
 
     btnSolveMaze.disabled = false;
 }
