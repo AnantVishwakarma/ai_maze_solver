@@ -56,7 +56,7 @@ function getNeighboursOfIndex(index, rows, cols, distance = 2) {
 
 
 /*****************Initialization*****************/
-const mazeCanvas = document.getElementById("maze");
+const mazeCanvas = document.getElementById("maze-canvas");
 const ctx = mazeCanvas.getContext("2d");
 const rowsInput = document.getElementById("rows");
 const colsInput = document.getElementById("cols");
@@ -87,6 +87,9 @@ const color = {
     passage: '#FFFFFF'
 };
 
+mazeCanvas.style.borderLeft = `${cellWidth}px solid ${color.wall}`;
+mazeCanvas.style.borderTop = `${cellWidth}px solid ${color.wall}`;
+
 
 /*****************Maze Generators*****************/
 function initMazeParameters() {
@@ -96,7 +99,13 @@ function initMazeParameters() {
     mazeHeight = rows * cellHeight;
     mazeCanvas.width = mazeWidth;
     mazeCanvas.height = mazeHeight;
-    mazeCanvas.style.border = `${cellWidth}px solid ${color.wall}`
+
+    if((rows & 1) === 1) mazeCanvas.style.borderBottom = `${cellWidth}px solid ${color.wall}`;
+    else mazeCanvas.style.borderBottom = 'none';
+
+    if((cols & 1) === 1) mazeCanvas.style.borderRight = `${cellWidth}px solid ${color.wall}`;
+    else mazeCanvas.style.borderRight = 'none';
+    
     animateMazeGeneration = animateMazeGenerationInput.checked;
 }
 
