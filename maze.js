@@ -259,6 +259,14 @@ async function animateSolvingMaze(msSleep=10) {
 }
 
 async function onClickBtnConstructMaze() {
+    if(+rowsInput.value < +rowsInput.min || +rowsInput.value > +rowsInput.max) {
+        alert(`Rows must be within ${rowsInput.min} to ${rowsInput.max}`);
+        return;
+    }
+    if(+colsInput.value < +colsInput.min || +colsInput.value > +colsInput.max) {
+        alert(`Columns must be within ${colsInput.min} to ${colsInput.max}`);
+        return;
+    }
     [rowsInput, colsInput, btnConstructMaze, btnSolveMaze, btnResetMaze, animateMazeGenerationInput].forEach(dom => dom.disabled = true);
     await constructRandomMaze(animateMazeGeneration);
     [rowsInput, colsInput, btnConstructMaze, btnSolveMaze, btnResetMaze, animateMazeGenerationInput].forEach(dom => dom.disabled = false);

@@ -8,21 +8,21 @@
     <title>Maze</title>
 </head>
 <body>
-    <div class="d-flex m-4">
-        <div class="d-flex flex-column card p-4">
+    <div class="d-flex justify-content-around align-items-start flex-wrap">
+        <div class="d-flex flex-column card p-4 m-4">
             <h5 class="text-center">Maze Parameters</h5>
             <table>
                 <tbody>
                     <tr>
                         <td class="px-1">Rows</td>
                         <td class="px-1">
-                            <input id="rows" type="number" class="form-control my-2" placeholder="rows" value="35">
+                            <input id="rows" type="number" class="form-control my-2" placeholder="rows" value="35" min="3" max="100">
                         </td>
                     </tr>
                     <tr>
                         <td class="px-1">Columns</td>
                         <td class="px-1">
-                            <input id="cols" type="number" class="form-control my-2" placeholder="columns" value="35">
+                            <input id="cols" type="number" class="form-control my-2" placeholder="columns" value="35" min="3" max="100">
                         </td>
                     </tr>
                 </tbody>
@@ -36,7 +36,7 @@
             <button id="btn-reset-maze" class="btn btn-secondary my-2">RESET MAZE</button>
         </div>
         
-        <div id="maze-container" class="mx-auto">
+        <div id="maze-container" class="mx-auto my-4">
             <canvas class="" id="maze-canvas">Your browser does not support the canvas element.</canvas>
         </div>
     </div>
