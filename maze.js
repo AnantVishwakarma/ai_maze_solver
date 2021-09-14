@@ -206,7 +206,7 @@ async function constructRandomMaze(animate) {
 }
 
 //returns a sequence of grid indices that were travelled
-function solveMaze(mazeGrid, rows, cols) {
+function solveMazeDFS(mazeGrid, rows, cols) {
     const travel = [];
     const stack = [];
     const visited = new Array(mazeGrid.grid.length).fill(false);
@@ -229,7 +229,7 @@ function solveMaze(mazeGrid, rows, cols) {
             //dead end
             travel[travel.length - 1].backtracking = true;
             stack.pop();
-            nextLocationIndex = stack[stack.length - 1];            
+            nextLocationIndex = stack[stack.length - 1];
         }
         else {
             //select random neighbour
@@ -248,23 +248,12 @@ function solveMaze(mazeGrid, rows, cols) {
 }
 
 async function animateSolvingMaze(msSleep=10) {
-    const travel = solveMaze(mazeGrid, rows, cols);
-    console.log(rows,cols,travel.map(x => {
-        let coords = getCoordinatesFromIndex(x.index, cols);
-        return [coords.row, coords.col];
-    }));
+    const travel = await solveMazeDFS(mazeGrid, rows, cols);
     fillBlock(travel[0].index, color.player);
     await sleep(msSleep);
     for(let i=1; i < travel.length; i++) {
         fillBlock(travel[i].index, color.player); // fill current cell
-
-        // fill previous cell
-        if(travel[i-1].backtracking) {
-            fillBlock(travel[i-1].index, color.backtracking);
-        }
-        else {
-            fillBlock(travel[i-1].index, color.travelling);
-        }
+        fillBlock(travel[i-1].index, travel[i-1].backtracking? color.backtracking : color.travelling); // fill previous cell
         await sleep(msSleep);
     }
 }
